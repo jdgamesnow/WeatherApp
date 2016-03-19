@@ -30,3 +30,9 @@ proguard/
 
 # Android Studio captures folder
 captures/
+
+# Temporary files
+*.tmp
+
+# Word meta files
+~$*
