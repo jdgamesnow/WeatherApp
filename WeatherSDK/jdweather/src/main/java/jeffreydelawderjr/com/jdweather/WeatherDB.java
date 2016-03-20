@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.graphics.Point;
 import android.util.Log;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -49,9 +51,18 @@ public class WeatherDB extends SQLiteOpenHelper{
     public static final String WEATHER_COLUMN_SUNSET = "sunset";
     public static final String WEATHER_COLUMN_IS_FORECAST = "is_forecast";
 
+    private static WeatherDB mInstance;
+
 
     public WeatherDB(Context context) {
         super(context, DATABASE_NAME, null, 1);
+    }
+
+    public static synchronized WeatherDB getInstance(Context context){
+        if (mInstance == null){
+            mInstance = new WeatherDB(context);
+        }
+        return mInstance;
     }
 
     @Override
@@ -96,7 +107,21 @@ public class WeatherDB extends SQLiteOpenHelper{
     public boolean insertLocation (Location location) {
         SQLiteDatabase db = this.getWritableDatabase();
         long rowID = db.insertWithOnConflict(LOCATIONS_TABLE_NAME, null, location.contentValues(), SQLiteDatabase.CONFLICT_IGNORE);
+        insertWeatherForLocation(location);
         return  rowID >= 0;
+    }
+
+    public Location insertLocation(JSONObject jsonObject){
+        Location location = Location.locationFromJSONObject(jsonObject);
+        insertLocation(location);
+        return location;
+    }
+
+    public void insertLocations(JSONObject jsonObject){
+        Location[] locations = Location.locationsFromJSONArray(jsonObject);
+        for (int i = 0; i < locations.length; i++){
+            insertLocation(locations[i]);
+        }
     }
 
     public boolean deleteLocation (Location location){

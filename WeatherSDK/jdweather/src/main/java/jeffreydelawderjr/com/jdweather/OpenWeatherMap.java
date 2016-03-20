@@ -36,9 +36,10 @@ public class OpenWeatherMap {
         volleyQueue = getRequestQueue();
     }
 
-    public static synchronized OpenWeatherMap getInstance(Context context) {
+    public static synchronized OpenWeatherMap getInstance(Context context, String appID) {
         if (mInstance == null) {
             mInstance = new OpenWeatherMap(context);
+            mAppID = appID;
         }
         return mInstance;
     }
@@ -134,7 +135,7 @@ public class OpenWeatherMap {
         jsonRequest(url, responseListener, errorListener);
     }
 
-    public void multiCityCurrentWeatherWithBox(String[] ids, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener){
+    public void multiCityCurrentWeatherWithIDs(String[] ids, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener){
         Uri.Builder builder = OpenWeatherMap.multiCityCurrentWeatherIdURI()
                 .appendQueryParameter("id",cityIdString(ids));
 
