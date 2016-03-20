@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">JDWeather</string>
+    <string name="preference_file_key">com.jeffreydelawderjr.jdweather.PREFERENCE_FILE_KEY</string>
 </resources>
