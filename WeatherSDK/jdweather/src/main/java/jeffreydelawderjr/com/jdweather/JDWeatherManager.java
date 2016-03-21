@@ -13,11 +13,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Created by jdelawde on 3/19/2016.
+ * This is meant to act the middle man for the UI and background classes such as WeatherDB and
+ * OpenWeatherMap. WeatherMapActivity uses this class for it's purposes automatically but other
+ * classes can use this for implementing other types of interfaces
  */
 public class JDWeatherManager {
-
-    public long apiUpdateTime;
-
 
     private static OpenWeatherMap openWeatherMap;
     private static WeatherDB weatherDB;
@@ -44,7 +44,8 @@ public class JDWeatherManager {
         return TimeUnit.MILLISECONDS.toMinutes(currentDate.getTime() - timeOfForecast.getTime());
     }
 
-    //Method for receiving lat and long
+    // Receives a latlng and uses that info to make an OpenWeatherMap API call, then we store it in
+    // the database and finally execute the caller's response listener
     public void addLocationWithLatLong(LatLng latLong, final Response.Listener<Location> locationListener){
         openWeatherMap.singleCityCurrentWeatherWithLatLong(latLong,
                 new Response.Listener<JSONObject>() {
@@ -52,7 +53,6 @@ public class JDWeatherManager {
                     public void onResponse(JSONObject response) {
                         // Add the response to the database
                         Location location = weatherDB.insertLocation(response);
-
                         // Let caller know or update map
                         locationListener.onResponse(location);
                     }
@@ -64,6 +64,7 @@ public class JDWeatherManager {
                 });
     }
 
+    // Same functionality as above but this method is prefered if locationId is known
     public void updateCurrentWeatherForLocation(Location location, final Response.Listener<Location> locationListener){
         openWeatherMap.singleCityCurrentWeatherWithCityId(Integer.toString(location.locationID),
                 new Response.Listener<JSONObject>() {
@@ -99,6 +100,4 @@ public class JDWeatherManager {
             }
         }
     }
-
-
 }

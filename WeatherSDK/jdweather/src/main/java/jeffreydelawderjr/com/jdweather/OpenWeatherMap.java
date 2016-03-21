@@ -18,6 +18,8 @@ import org.json.JSONObject;
 
 /**
  * Created by jdelawde on 3/19/2016.
+ * This class is responsible for interacting with the OpenWeatherMap API. An API key for OpenWeatherMap
+ * is required for applications that utilize this functionality.
  */
 public class OpenWeatherMap {
 

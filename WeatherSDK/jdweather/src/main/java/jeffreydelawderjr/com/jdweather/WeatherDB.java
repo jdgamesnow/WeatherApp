@@ -16,6 +16,8 @@ import java.util.Date;
 
 /**
  * Created by jdelawde on 3/19/2016.
+ * Meant for this class to act as a store for OpenWeatherMap data. The idea is that JDWeatherManager
+ * would check here before making API calls with OpenWeatherMap.
  */
 public class WeatherDB extends SQLiteOpenHelper{
 
@@ -27,7 +29,6 @@ public class WeatherDB extends SQLiteOpenHelper{
     public static final String LOCATIONS_COLUMN_LATITUDE = "lat";
     public static final String LOCATIONS_COLUMN_CITY_ID = "c_id";
     public static final String LOCATIONS_COLUMN_CITY_NAME = "name";
-   // public static final String LOCATIONS_COLUMN_CITY_ORDER = "c_order";
 
     // Weather Table
     public static final String WEATHER_TABLE_NAME = "weather";

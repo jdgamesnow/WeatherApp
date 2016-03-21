@@ -13,6 +13,7 @@ import java.util.Date;
 
 /**
  * Created by jdelawde on 3/19/2016.
+ * Simple class I use to model OpenWeatherMap's weather data.
  */
 public class Weather {
     public String title;
@@ -37,6 +38,7 @@ public class Weather {
     public Date sunsetDate;
     public Date weatherDate;
 
+    // Convert's  json response into Weather object
     public static Weather weatherFromJSONObject(JSONObject jsonObject){
         if (jsonObject == null){
             return null;
@@ -118,6 +120,7 @@ public class Weather {
         weatherDate = new Date(weatherTime);
     }
 
+    // Can add more data to this but gives a simple example for displaying weather data
     public String toString(){
         String overview = "Current Condition: " + description
                 + "\n Temperature: " + temperature
@@ -126,7 +129,7 @@ public class Weather {
         return overview;
     }
 
-
+    // Method used for when inserting weather object into WeatherDB database
     public ContentValues contentValues() {
         ContentValues cv = new ContentValues();
         cv.put(WeatherDB.WEATHER_COLUMN_WEATHER_FORECAST_TIME, weatherTime);

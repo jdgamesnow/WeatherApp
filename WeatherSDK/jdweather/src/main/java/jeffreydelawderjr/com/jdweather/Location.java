@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 /**
  * Created by jdelawde on 3/19/2016.
+ * Simple class I used to represent OpenWeatherMap locations.
  */
 public class Location {
 
@@ -19,6 +20,7 @@ public class Location {
     public Weather currentWeather;
     public Weather[] forecast;
 
+    // Useful function that parses API's json data and creates a Location object
     public static Location locationFromJSONObject(JSONObject jsonObject){
         Location location = new Location();
 
@@ -54,6 +56,7 @@ public class Location {
         return location;
     }
 
+    // Same as above but handles multiple locations
     public static Location[] locationsFromJSONArray(JSONObject jsonObject){
         ArrayList<Location> locations = new ArrayList<Location>();
         JSONArray jsonArray = JSONHelper.jsonArrayForKeyWithDefault(jsonObject,"list",null);
@@ -70,6 +73,7 @@ public class Location {
         return locations.toArray(new Location[locations.size()]);
     }
 
+    // Convenient for when I am storing the object in WeatherDB database
     public ContentValues contentValues() {
         ContentValues cv = new ContentValues();
         cv.put(WeatherDB.LOCATIONS_COLUMN_CITY_NAME, locationName);

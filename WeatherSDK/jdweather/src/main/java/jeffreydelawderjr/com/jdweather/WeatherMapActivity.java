@@ -2,14 +2,11 @@ package jeffreydelawderjr.com.jdweather;
 
 import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -34,10 +31,15 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.jar.Manifest;
 
 /**
  * Created by jdelawde on 3/20/2016.
+ * This is the simplest way for external application to utilize my sdk. All they have to do is extend
+ * this class and call initializeMapFragmentWithID passing the id of the view they want the map
+ * to appear in; additionally for weather updates they will need to call initializeWeatherManagerWithAppId
+ * and pass their OpenWeatherMap API key. There are several methods they can override in order to customize
+ * the final appearance and behavior of the map. Overall external application have to do very little
+ * to use the current functionality provided by my JDWeather sdk.
  */
 public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCallback, ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
@@ -63,6 +65,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
         }
     }
 
+    // Pass the view's id that you want the map to appear in
     public void initializeMapFragmentWithID(int id){
         GoogleMapOptions mapOptions = new GoogleMapOptions();
         mapOptions.mapType(GoogleMap.MAP_TYPE_NORMAL)
@@ -78,6 +81,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
         mMapFragment.getMapAsync(this);
     }
 
+    // Pass in your OpenWeatherMap api key
     public void initializeWeatherManagerWithAppId(String appID){
         weatherManager = JDWeatherManager.getInstance(getApplicationContext(),appID);
     }
@@ -151,6 +155,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
 
     }
 
+    // call this method if you want to use automatic location detection
     public void detectLocation(){
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -208,6 +213,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
         }
     }
 
+    // Override this method if you want to return a custom marker image for the weather condition
     public int assetNameForWeather(Weather weather){
         int id = getResources().getIdentifier(weather.icon, "drawable", getPackageName());
         return id;

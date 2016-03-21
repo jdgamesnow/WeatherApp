@@ -13,6 +13,7 @@ public class MainActivity extends WeatherMapActivity {
         setContentView(R.layout.activity_main);
         initializeMapFragmentWithID(R.id.mapView);
         initializeWeatherManagerWithAppId("b1a86919cd79b32b70de19a3142842f5");
+        detectLocation();
     }
 
 }
