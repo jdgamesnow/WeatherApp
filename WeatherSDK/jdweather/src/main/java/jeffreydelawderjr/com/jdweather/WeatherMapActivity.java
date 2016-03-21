@@ -4,10 +4,16 @@ import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 
 import com.android.volley.Response;
@@ -25,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.jar.Manifest;
@@ -87,8 +94,36 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void onMapReady(GoogleMap map) {
-        Log.i("WeatherSDK", "onMapReady");
         mMap = map;
+        mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                LinearLayout info = new LinearLayout(getApplicationContext());
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(getApplicationContext());
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(getApplicationContext());
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
         if (mCurrentLocation != null){
             zoomToLocation(mCurrentLocation);
         }
@@ -113,6 +148,10 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
 
     @Override
     public void onConnected(Bundle bundle){
+
+    }
+
+    public void detectLocation(){
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
@@ -126,8 +165,6 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
             zoomToLocation(mCurrentLocation);
 
         }
-
-
     }
 
     public void onRequestPermissionsResult(int requestCode,
@@ -156,12 +193,13 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
                 @Override
                 public void onResponse(Location response) {
                     BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(assetNameForWeather(response.currentWeather));
-                    Log.i("WeatherSDK", "Current weather is " + response.currentWeather.title + " Icon " + response.currentWeather.icon + " Bitmap " + bitmap.toString());
                     mMap.addMarker(new MarkerOptions()
                             .position(new LatLng(response.latLong.latitude, response.latLong.longitude))
                             .title(response.locationName)
                             .anchor(.5f,.5f)
-                            .icon(bitmap));
+                            .icon(bitmap))
+                            .setSnippet(response.currentWeather.toString());
+
                     CameraPosition cameraPosition = new CameraPosition.Builder().target(response.latLong).zoom(10.0f).build();
                     CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
                     mMap.moveCamera(cameraUpdate);

@@ -118,7 +118,13 @@ public class Weather {
         weatherDate = new Date(weatherTime);
     }
 
-
+    public String toString(){
+        String overview = "Current Condition: " + description
+                + "\n Temperature: " + temperature
+                + "\n Humidity: " + humidity
+                + "\n Pressure: " + pressure;
+        return overview;
+    }
 
 
     public ContentValues contentValues() {
