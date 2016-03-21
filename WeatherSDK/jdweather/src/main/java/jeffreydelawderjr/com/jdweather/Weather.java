@@ -17,6 +17,7 @@ import java.util.Date;
 public class Weather {
     public String title;
     public String description;
+    public String icon;
     public float temperature;
     public float minTemperature;
     public float maxTemperature;
@@ -49,6 +50,7 @@ public class Weather {
             // For demo purposes use the first weather description object
             JSONObject wObj = JSONHelper.jsonObjectAtIndex(weatherObject,0);
             weather.title = JSONHelper.stringValueForKeyWithDefault(wObj,"main","");
+            weather.icon = "w" + JSONHelper.stringValueForKeyWithDefault(wObj,"icon","");
             weather.description = JSONHelper.stringValueForKeyWithDefault(wObj,"description","");
         }
 
@@ -126,6 +128,7 @@ public class Weather {
         cv.put(WeatherDB.WEATHER_COLUMN_DESCRIPTION, description);
         cv.put(WeatherDB.WEATHER_COLUMN_TITLE, title);
         cv.put(WeatherDB.WEATHER_COLUMN_GROUND_LEVEL, groundLevel);
+        cv.put(WeatherDB.WEATHER_COLUMN_ICON, icon);
         cv.put(WeatherDB.WEATHER_COLUMN_SEA_LEVEL, seaLevel);
         cv.put(WeatherDB.WEATHER_COLUMN_HUMIDITY, humidity);
         cv.put(WeatherDB.WEATHER_COLUMN_MAXIMUM_TEMPERATURE, maxTemperature);

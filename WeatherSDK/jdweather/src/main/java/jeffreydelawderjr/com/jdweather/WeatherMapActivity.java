@@ -2,6 +2,8 @@ package jeffreydelawderjr.com.jdweather;
 
 import android.app.FragmentTransaction;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -19,6 +21,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,7 +38,7 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
 
-    private android.location.Location mCurrentLocation;
+    private LatLng mCurrentLocation;
     private static final int REQUEST_LOCATION = 1;
 
     public JDWeatherManager weatherManager;
@@ -89,6 +93,12 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
             zoomToLocation(mCurrentLocation);
         }
 
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                zoomToLocation(latLng);
+            }
+        });
     }
 
     @Override
@@ -111,7 +121,9 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
                     REQUEST_LOCATION);
         } else {
             // permission has been granted, continue as usual
-            zoomToLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+            android.location.Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+            zoomToLocation(mCurrentLocation);
 
         }
 
@@ -126,7 +138,9 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // permission has been granted, continue as usual
                 try {
-                    zoomToLocation(LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient));
+                    android.location.Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+                    mCurrentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+                    zoomToLocation(mCurrentLocation);
                 }catch (SecurityException e){
 
                 }
@@ -136,24 +150,28 @@ public class WeatherMapActivity extends FragmentActivity implements OnMapReadyCa
         }
     }
 
-    public void zoomToLocation(android.location.Location location){
-        mCurrentLocation = location;// new Point((int)location.getLatitude(), (int)location.getLongitude());
+    public void zoomToLocation(final LatLng latlong){
         if (weatherManager != null) {
-            weatherManager.updateCurrentWeatherForLatLong(new LatLng(location.getLatitude(), location.getLongitude()), new Response.Listener<Location>() {
+            weatherManager.updateCurrentWeatherForLatLong(latlong, new Response.Listener<Location>() {
                 @Override
                 public void onResponse(Location response) {
-                    Log.i("WeatherSDK", "Current weather is " + response.currentWeather.title);
+                    BitmapDescriptor bitmap = BitmapDescriptorFactory.fromResource(assetNameForWeather(response.currentWeather));
+                    Log.i("WeatherSDK", "Current weather is " + response.currentWeather.title + " Icon " + response.currentWeather.icon + " Bitmap " + bitmap.toString());
+                    mMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(response.latLong.latitude, response.latLong.longitude))
+                            .title(response.locationName)
+                            .anchor(.5f,.5f)
+                            .icon(bitmap));
+                    CameraPosition cameraPosition = new CameraPosition.Builder().target(response.latLong).zoom(10.0f).build();
+                    CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
+                    mMap.moveCamera(cameraUpdate);
                 }
             });
         }
-        if (mMap != null){
-            Log.i("WeatherSDK", "Zooming to Location");
-            CameraPosition cameraPosition = new CameraPosition.Builder().target(new LatLng(location.getLatitude(), location.getLongitude())).zoom(14.0f).build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newCameraPosition(cameraPosition);
-            mMap.moveCamera(cameraUpdate);
-            mMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title("Marker"));
-        }
+    }
+
+    public int assetNameForWeather(Weather weather){
+        int id = getResources().getIdentifier(weather.icon, "drawable", getPackageName());
+        return id;
     }
 }

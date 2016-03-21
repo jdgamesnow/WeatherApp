@@ -33,6 +33,7 @@ public class WeatherDB extends SQLiteOpenHelper{
     public static final String WEATHER_TABLE_NAME = "weather";
     public static final String WEATHER_COLUMN_WEATHER_FORECAST_TIME = "time";
     public static final String WEATHER_COLUMN_CITY_ID = "c_id";
+    public static final String WEATHER_COLUMN_ICON = "icon";
     public static final String WEATHER_COLUMN_TITLE = "title";
     public static final String WEATHER_COLUMN_DESCRIPTION = "desc";
     public static final String WEATHER_COLUMN_TEMPERATURE = "temp";
@@ -78,6 +79,7 @@ public class WeatherDB extends SQLiteOpenHelper{
                 + WEATHER_COLUMN_CITY_ID + " integer, "
                 + WEATHER_COLUMN_TITLE + " text, "
                 + WEATHER_COLUMN_DESCRIPTION + " text, "
+                + WEATHER_COLUMN_ICON + " text, "
                 + WEATHER_COLUMN_TEMPERATURE + " real, "
                 + WEATHER_COLUMN_PRESSURE + " integer, "
                 + WEATHER_COLUMN_HUMIDITY + " integer, "
@@ -242,6 +244,7 @@ public class WeatherDB extends SQLiteOpenHelper{
         weather.cloudiness = cursor.getInt(cursor.getColumnIndex(WEATHER_COLUMN_CLOUDINESS));
         weather.pressure = cursor.getInt(cursor.getColumnIndex(WEATHER_COLUMN_PRESSURE));
         weather.humidity = cursor.getInt(cursor.getColumnIndex(WEATHER_COLUMN_HUMIDITY));
+        weather.icon = cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_ICON));
 
         weather.groundLevel = cursor.getFloat(cursor.getColumnIndex(WEATHER_COLUMN_GROUND_LEVEL));
         weather.seaLevel = cursor.getFloat(cursor.getColumnIndex(WEATHER_COLUMN_SEA_LEVEL));
