@@ -1,7 +1,7 @@
 package jeffreydelawderjr.com.jdweather;
 
 import android.content.Context;
-import android.graphics.Point;
+import com.google.android.gms.maps.model.LatLng;
 
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -45,7 +45,7 @@ public class JDWeatherManager {
     }
 
     //Method for receiving lat and long
-    public void addLocationWithLatLong(Point latLong, final Response.Listener<Location> locationListener){
+    public void addLocationWithLatLong(LatLng latLong, final Response.Listener<Location> locationListener){
         openWeatherMap.singleCityCurrentWeatherWithLatLong(latLong,
                 new Response.Listener<JSONObject>() {
                     @Override
@@ -84,7 +84,7 @@ public class JDWeatherManager {
     }
 
     // Method for retrieving current weather data for single locations
-    public void updateCurrentWeatherForLatLong(Point latLong, Response.Listener<Location> locationListener){
+    public void updateCurrentWeatherForLatLong(LatLng latLong, Response.Listener<Location> locationListener){
         //Check if location exists in database
         Location location = weatherDB.getLocationForLatLong(latLong);
         if (location == null) {

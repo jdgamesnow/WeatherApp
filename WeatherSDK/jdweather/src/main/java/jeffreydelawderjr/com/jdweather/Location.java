@@ -1,15 +1,11 @@
 package jeffreydelawderjr.com.jdweather;
 
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.graphics.Point;
-import android.util.Log;
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -19,7 +15,7 @@ public class Location {
 
     public String locationName;
     public int locationID;
-    public Point latLong;
+    public LatLng latLong;
     public Weather currentWeather;
     public Weather[] forecast;
 
@@ -51,9 +47,9 @@ public class Location {
         location.locationID = JSONHelper.intValueForKeyWithDefault(jsonObject,"id",-1);
         JSONObject coord = JSONHelper.jsonObjectForKeyWithDefault(jsonObject, "coord", null);
         if (coord != null){
-            int lat = JSONHelper.intValueForKeyWithDefault(coord,"lat",0);
-            int lon = JSONHelper.intValueForKeyWithDefault(coord, "lon", 0);
-            location.latLong = new Point(lat,lon);
+            float lat = JSONHelper.floatValueForKeyWithDefault(coord, "lat", 0);
+            float lon = JSONHelper.floatValueForKeyWithDefault(coord, "lon", 0);
+            location.latLong = new LatLng(lat,lon);
         }
         return location;
     }
@@ -78,8 +74,8 @@ public class Location {
         ContentValues cv = new ContentValues();
         cv.put(WeatherDB.LOCATIONS_COLUMN_CITY_NAME, locationName);
         cv.put(WeatherDB.LOCATIONS_COLUMN_CITY_ID, locationID);
-        cv.put(WeatherDB.LOCATIONS_COLUMN_LONGITUDE, latLong.x);
-        cv.put(WeatherDB.LOCATIONS_COLUMN_LATITUDE, latLong.y);
+        cv.put(WeatherDB.LOCATIONS_COLUMN_LONGITUDE, latLong.latitude);
+        cv.put(WeatherDB.LOCATIONS_COLUMN_LATITUDE, latLong.longitude);
         return cv;
     }
 }

@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Point;
+import com.google.android.gms.maps.model.LatLng;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -27,7 +27,7 @@ public class WeatherDB extends SQLiteOpenHelper{
     public static final String LOCATIONS_COLUMN_LATITUDE = "lat";
     public static final String LOCATIONS_COLUMN_CITY_ID = "c_id";
     public static final String LOCATIONS_COLUMN_CITY_NAME = "name";
-    public static final String LOCATIONS_COLUMN_CITY_ORDER = "c_order";
+   // public static final String LOCATIONS_COLUMN_CITY_ORDER = "c_order";
 
     // Weather Table
     public static final String WEATHER_TABLE_NAME = "weather";
@@ -70,13 +70,12 @@ public class WeatherDB extends SQLiteOpenHelper{
         db.execSQL("create table " + LOCATIONS_TABLE_NAME + "("
             + LOCATIONS_COLUMN_CITY_ID + " integer primary key, "
             + LOCATIONS_COLUMN_CITY_NAME + " text, "
-            + LOCATIONS_COLUMN_CITY_ORDER + " integer AUTOINCREMENT NOT NULL, "
-            + LOCATIONS_COLUMN_LATITUDE + " integer, "
-            + LOCATIONS_COLUMN_LONGITUDE + " integer)");
+            + LOCATIONS_COLUMN_LATITUDE + " real, "
+            + LOCATIONS_COLUMN_LONGITUDE + " real)");
 
         db.execSQL("create table " + WEATHER_TABLE_NAME + "("
                 + WEATHER_COLUMN_WEATHER_FORECAST_TIME + " integer primary key, "
-                + "FOREIGN KEY (" + WEATHER_COLUMN_CITY_ID + ") REFERENCES " + LOCATIONS_TABLE_NAME + "(" + LOCATIONS_COLUMN_CITY_ID + "), "
+                + WEATHER_COLUMN_CITY_ID + " integer, "
                 + WEATHER_COLUMN_TITLE + " text, "
                 + WEATHER_COLUMN_DESCRIPTION + " text, "
                 + WEATHER_COLUMN_TEMPERATURE + " real, "
@@ -93,7 +92,8 @@ public class WeatherDB extends SQLiteOpenHelper{
                 + WEATHER_COLUMN_SUNSET + " integer, "
                 + WEATHER_COLUMN_IS_FORECAST + " integer, "
                 + WEATHER_COLUMN_RAIN_VOLUME + " real, "
-                + WEATHER_COLUMN_SNOW_VOLUME + " real)");
+                + WEATHER_COLUMN_SNOW_VOLUME + " real,"
+                + "FOREIGN KEY (" + WEATHER_COLUMN_CITY_ID + ") REFERENCES " + LOCATIONS_TABLE_NAME + "(" + LOCATIONS_COLUMN_CITY_ID + "))");
     }
 
     @Override
@@ -111,13 +111,13 @@ public class WeatherDB extends SQLiteOpenHelper{
         return  rowID >= 0;
     }
 
-    public Location insertLocation(JSONObject jsonObject){
+    public Location insertLocation(JSONObject jsonObject) {
         Location location = Location.locationFromJSONObject(jsonObject);
         insertLocation(location);
         return location;
     }
 
-    public void insertLocations(JSONObject jsonObject){
+    public void insertLocations(JSONObject jsonObject) {
         Location[] locations = Location.locationsFromJSONArray(jsonObject);
         for (int i = 0; i < locations.length; i++){
             insertLocation(locations[i]);
@@ -144,21 +144,13 @@ public class WeatherDB extends SQLiteOpenHelper{
         return locationFromCursor(cursor);
     }
 
-    public Location getLocationWithOrder(int order){
 
+    public Location getLocationForLatLong(LatLng latLong){
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * "
                 + " from " + LOCATIONS_TABLE_NAME
-                + " where " + LOCATIONS_COLUMN_CITY_ORDER + "=" + order, null);
-        return locationFromCursor(cursor);
-    }
-
-    public Location getLocationForLatLong(Point latLong){
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * "
-                + " from " + LOCATIONS_TABLE_NAME
-                + " where " + LOCATIONS_COLUMN_LONGITUDE + "=" + latLong.x
-                + " AND " + LOCATIONS_COLUMN_LATITUDE + "=" + latLong.y, null);
+                + " where " + LOCATIONS_COLUMN_LONGITUDE + "=" + latLong.longitude
+                + " AND " + LOCATIONS_COLUMN_LATITUDE + "=" + latLong.latitude, null);
         return locationFromCursor(cursor);
     }
 
@@ -175,13 +167,14 @@ public class WeatherDB extends SQLiteOpenHelper{
     }
 
     public Location locationFromCursor(Cursor cursor){
-        Location location = new Location();
+        Location location = null;
         if (cursor.getCount() > 0){
+            location = new Location();
             location.locationID = cursor.getInt(cursor.getColumnIndex(LOCATIONS_COLUMN_CITY_ID));
             location.locationName = cursor.getString(cursor.getColumnIndex(LOCATIONS_COLUMN_CITY_NAME));
-            int lat = cursor.getInt(cursor.getColumnIndex(LOCATIONS_COLUMN_LATITUDE));
-            int lon = cursor.getInt(cursor.getColumnIndex(LOCATIONS_COLUMN_LONGITUDE));
-            location.latLong = new Point(lat, lon);
+            float lat = cursor.getFloat(cursor.getColumnIndex(LOCATIONS_COLUMN_LATITUDE));
+            float lon = cursor.getFloat(cursor.getColumnIndex(LOCATIONS_COLUMN_LONGITUDE));
+            location.latLong = new LatLng(lat, lon);
         }
         return location;
     }
@@ -200,7 +193,7 @@ public class WeatherDB extends SQLiteOpenHelper{
             db.insertWithOnConflict(WEATHER_TABLE_NAME, null, cv, SQLiteDatabase.CONFLICT_IGNORE);
         }
 
-        if (location.forecast.length > 0){
+        if (location.forecast != null && location.forecast.length > 0){
             for (int i = 0; i < location.forecast.length; i++){
                 ContentValues cv = location.forecast[i].contentValues();
 

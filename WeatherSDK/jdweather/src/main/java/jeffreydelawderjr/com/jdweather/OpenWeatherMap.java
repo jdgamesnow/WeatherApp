@@ -2,7 +2,7 @@ package jeffreydelawderjr.com.jdweather;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Point;
+import com.google.android.gms.maps.model.LatLng;
 import android.graphics.Rect;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -106,10 +106,10 @@ public class OpenWeatherMap {
         return result.length() > 0 ? result.substring(0, result.length() - 1): "";
     }
 
-    public void singleCityCurrentWeatherWithLatLong(Point latLong, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener){
+    public void singleCityCurrentWeatherWithLatLong(LatLng latLong, Response.Listener<JSONObject> responseListener, Response.ErrorListener errorListener){
         Uri.Builder builder = OpenWeatherMap.singleCityCurrentWeatherURI()
-                .appendQueryParameter("lat", Integer.toString(latLong.x))
-                .appendQueryParameter("lon", Integer.toString(latLong.y));
+                .appendQueryParameter("lat", Double.toString(latLong.latitude))
+                .appendQueryParameter("lon", Double.toString(latLong.longitude));
 
         String url = builder.build().toString();
         jsonRequest(url, responseListener, errorListener);

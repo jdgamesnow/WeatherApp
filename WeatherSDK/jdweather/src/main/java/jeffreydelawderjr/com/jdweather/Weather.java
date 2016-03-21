@@ -40,11 +40,16 @@ public class Weather {
         if (jsonObject == null){
             return null;
         }
+
+        Log.i("WeatherSDK", jsonObject.toString());
+
         Weather weather = new Weather();
-        JSONObject weatherObject = JSONHelper.jsonObjectForKeyWithDefault(jsonObject,"weather",null);
-        if (weather != null){
-            weather.title = JSONHelper.stringValueForKeyWithDefault(weatherObject,"main","");
-            weather.description = JSONHelper.stringValueForKeyWithDefault(weatherObject,"description","");
+        JSONArray weatherObject = JSONHelper.jsonArrayForKeyWithDefault(jsonObject, "weather", null);
+        if (weatherObject != null && weatherObject.length() > 0){
+            // For demo purposes use the first weather description object
+            JSONObject wObj = JSONHelper.jsonObjectAtIndex(weatherObject,0);
+            weather.title = JSONHelper.stringValueForKeyWithDefault(wObj,"main","");
+            weather.description = JSONHelper.stringValueForKeyWithDefault(wObj,"description","");
         }
 
         JSONObject main = JSONHelper.jsonObjectForKeyWithDefault(jsonObject,"main",null);
